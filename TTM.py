@@ -1,6 +1,8 @@
 import tkinter as tk
+import pyperclip
 from tkinter import ttk
 from tkinter import messagebox
+
 
 def get_customer_data():
     # ... (unchanged)
@@ -130,6 +132,12 @@ def toggle_dark_mode():
 def toggle_dark_mode_command():
     toggle_dark_mode()
 
+def copy_to_clipboard():
+    result_text = format_text.get(1.0, tk.END)
+    pyperclip.copy(result_text)
+    messagebox.showinfo("Copy to Clipboard", "Output copied to clipboard!")
+
+
 def update_working_memory(event):
     # Update working memory with the current value of the entry widget
     widget = event.widget
@@ -181,7 +189,7 @@ options_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="Options", menu=options_menu)
 
 options_menu.add_command(label="Clear", command=clear_entries)
-options_menu.add_command(label="Toggle Dark Mode", command=toggle_dark_mode_command)
+#options_menu.add_command(label="Toggle Dark Mode", command=toggle_dark_mode_command)
 options_menu.add_command(label="Show About", command=show_about)
 options_menu.add_separator()
 options_menu.add_checkbutton(label="Use Tab-Separated Values", variable=use_tab_values, command=use_tab_values)
@@ -309,6 +317,9 @@ insert_and_format_button.pack()
 # Bind the event to update working memory dynamically
 customer_data_entry.bind("<KeyRelease>", update_working_memory)
 
+# Button to Copy to Clipboard
+copy_button = tk.Button(root, text="Copy to Clipboard", command=copy_to_clipboard)
+copy_button.pack()
 
 # Create a clear button
 clear_button = tk.Button(root, text="Clear", command=clear_entries)
