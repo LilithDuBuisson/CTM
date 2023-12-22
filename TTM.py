@@ -2,6 +2,7 @@ import tkinter as tk
 import pyperclip
 from tkinter import ttk
 from tkinter import messagebox
+from rich import print
 
 
 def get_customer_data():
