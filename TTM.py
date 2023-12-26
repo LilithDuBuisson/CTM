@@ -2,7 +2,11 @@ import tkinter as tk
 import pyperclip
 from tkinter import ttk
 from tkinter import messagebox
-#from rich import print
+from rich import print
+from rich.layout import Layout
+from rich.live import Live
+from rich.console import Console
+from rich.terminal_theme import MONOKAI
 
 
 def get_customer_data():
@@ -55,6 +59,9 @@ def insert_and_format():
     # Get summary data
     summary_data = summary_entry.get().strip()
 
+    # Create a RichText console
+    console = Console()
+
     # Combine all messages
     result_message = (f"Issue:\n{variable_message}\n\n"
                       f"Customer ID: {customer_id}\nNode/Pod: {node_pod}\nDomain: {domain}\n\n"
@@ -66,12 +73,19 @@ def insert_and_format():
                       f"Similar Ticket: \n\n"
                       f"Conclusion: \n"
                       f"Action: \n")
-
-    # Clear the text area
+    
+    # Clear the RichText console
     format_text.delete(1.0, tk.END)
 
+    # Print the combined result to the RichText console
+    console.print(result_message)
+
+#Don't touch this is for the old text box stuff
+    
+    # Clear the text area
+    #format_text.delete(1.0, tk.END)
     # Insert the combined result into the format box
-    format_text.insert(tk.END, result_message)
+    #format_text.insert(tk.END, result_message)
 
 def clear_entries():
     # Clear the content of entry widgets
@@ -261,7 +275,7 @@ customer_data_entry.pack()
 customer_id_label = tk.Label(root, text="Customer ID:")
 customer_id_label.pack()
 
-customer_id_entry = tk.Entry(root)
+customer_id_entry = tk.Entry(root, width= 6)
 customer_id_entry.pack()
 
 node_pod_label = tk.Label(root, text="Node/Pod:")
@@ -336,8 +350,17 @@ copy_button.pack()
 clear_button = tk.Button(root, text="Clear", command=clear_entries)
 clear_button.pack()
 
-# Format Text Area
-format_text = tk.Text(root, height=12, width=40)
-format_text.pack()
+
+
+# Use a Text widget for displaying rich text
+#format_text = tk.Text(root, height=12, width=40, wrap=tk.WORD)
+#format_text.pack()
+
+#console = Console(width=80)
+
+# Redirect the console output to the Text widget
+#console.print = lambda *args, **kwargs: result_message.insert(tk.END, " ".join(map(str, args)) + "\n")
+#console.save_text = format_text.get  # Function to get the contents of the Text widget
+
 
 root.mainloop()
