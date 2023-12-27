@@ -350,17 +350,15 @@ copy_button.pack()
 clear_button = tk.Button(root, text="Clear", command=clear_entries)
 clear_button.pack()
 
-
-
 # Use a Text widget for displaying rich text
-#format_text = tk.Text(root, height=12, width=40, wrap=tk.WORD)
-#format_text.pack()
+format_text = tk.Text(root, height=12, width=40, wrap=tk.WORD)
+format_text.pack()
 
-#console = Console(width=80)
+console = Console(width=80)
 
 # Redirect the console output to the Text widget
-#console.print = lambda *args, **kwargs: result_message.insert(tk.END, " ".join(map(str, args)) + "\n")
-#console.save_text = format_text.get  # Function to get the contents of the Text widget
+console.print = lambda *args, **kwargs: result_message.insert(tk.END, " ".join(map(str, args)) + "\n")
+console.save_text = format_text.get  # Function to get the contents of the Text widget
 
 
 root.mainloop()
