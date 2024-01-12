@@ -6,11 +6,11 @@ from rich import print
 from rich.layout import Layout
 from rich.live import Live
 from rich.console import Console
-from rich.terminal_theme import MONOKAI
+#from rich.terminal_theme import MONOKAI
 
 
 def get_customer_data():
-    # ... (unchanged)
+   
    if use_tab_values.get():
         customer_data = customer_data_entry.get().strip().split('\t')
         return customer_data[:3] if len(customer_data) == 3 else ('', '', '')
@@ -21,7 +21,7 @@ def get_customer_data():
             domain_entry.get().strip()
         )
 def get_affected_user_data():
-    # ... (unchanged)
+     
      if use_tab_values.get():
         user_data = affected_user_entry.get().strip().split('\t')
         return user_data[:5] if len(user_data) == 5 else ('', '', '', '', '')
@@ -35,7 +35,7 @@ def get_affected_user_data():
         )
 
 def insert_and_format():
-    # ... (unchanged)
+
     selected_var = selected_variable.get()
     failure_type = failure_type_variable.get()
 
@@ -74,18 +74,18 @@ def insert_and_format():
                       f"Conclusion: \n"
                       f"Action: \n")
     
-    # Clear the RichText console
+    # Clear the Text widget
     format_text.delete(1.0, tk.END)
 
-    # Print the combined result to the RichText console
-    console.print(result_message)
-
-#Don't touch this is for the old text box stuff
-    
-    # Clear the text area
-    #format_text.delete(1.0, tk.END)
     # Insert the combined result into the format box
-    #format_text.insert(tk.END, result_message)
+    format_text.insert(tk.END, result_message + "\n")
+
+def undo_text():
+    try:
+        format_text.edit_undo()
+    except tk.TclError:
+        pass  # Ignore if no more undo operations are available
+ 
 
 def clear_entries():
     # Clear the content of entry widgets
@@ -171,6 +171,8 @@ def update_working_memory(event):
 def show_about():
     about_text = "CTM App\nVersion 1.1\n\n© October 21 2015 CPazmino, LDuBuisson"
     tk.messagebox.showinfo("About", about_text)
+   
+   
 
 root = tk.Tk()
 root.title("CTM")
@@ -191,8 +193,23 @@ lastBackupDate_entry = tk.Entry(root)
 sizeInGb_entry = tk.Entry(root)
 format_text = tk.Text(root, height=12, width=40)
 
+
 # BooleanVar to determine whether to use tab-separated values
 use_tab_values = tk.BooleanVar(value=True)
+
+# Create a Notebook (tabbed interface)
+notebook = ttk.Notebook(root)
+notebook.pack(fill=tk.BOTH, expand=True)
+
+# Function to switch to the selected page
+def switch_page(event):
+    selected_page = variable_dropdown.get()
+    notebook.select(notebook.index(selected_page))
+
+# Create your pages as separate frames
+page1 = ttk.Frame(notebook)
+page2 = ttk.Frame(notebook)
+page3 = ttk.Frame(notebook)
 
 # Working memory to dynamically store entry widget values
 working_memory = {}
@@ -231,6 +248,21 @@ customer_data_entry.bind("<KeyRelease>", update_working_memory)
 # Checkbox to choose between tab-separated values and direct entry
 #tab_checkbox = ttk.Checkbutton(root, text="Use Tab-Separated Values", variable=use_tab_values)
 #tab_checkbox.pack()
+
+
+# Add pages to the Notebook
+notebook.add(page1, text="Backup Failure")
+notebook.add(page2, text="Restore Failure")
+notebook.add(page3, text="2FA reset")
+# Add widgets to each page
+# ... (add your widgets to page1 and page2)
+
+# Bind the event to switch pages when the dropdown selection changes
+#variable_dropdown.bind("<<ComboboxSelected>>", switch_page)
+
+# Widgets for Page 1
+label_page1 = tk.Label(page1, text="Page 1 Widgets")
+label_page1.pack(pady=10)
 
 # Define your variable list here
 affected_suite = [
@@ -350,15 +382,14 @@ copy_button.pack()
 clear_button = tk.Button(root, text="Clear", command=clear_entries)
 clear_button.pack()
 
+# Create a button for undo
+undo_button = tk.Button(root, text="Undo", command=undo_text)
+undo_button.pack()
+
 # Use a Text widget for displaying rich text
 format_text = tk.Text(root, height=12, width=40, wrap=tk.WORD)
 format_text.pack()
 
 console = Console(width=80)
-
-# Redirect the console output to the Text widget
-console.print = lambda *args, **kwargs: result_message.insert(tk.END, " ".join(map(str, args)) + "\n")
-console.save_text = format_text.get  # Function to get the contents of the Text widget
-
 
 root.mainloop()
