@@ -3,10 +3,14 @@ import pyperclip
 from tkinter import ttk
 from tkinter import messagebox
 from rich import print
+from rich.layout import Layout
+from rich.live import Live
+from rich.console import Console
+#from rich.terminal_theme import MONOKAI
 
 
 def get_customer_data():
-    # ... (unchanged)
+   
    if use_tab_values.get():
         customer_data = customer_data_entry.get().strip().split('\t')
         return customer_data[:3] if len(customer_data) == 3 else ('', '', '')
@@ -17,7 +21,7 @@ def get_customer_data():
             domain_entry.get().strip()
         )
 def get_affected_user_data():
-    # ... (unchanged)
+     
      if use_tab_values.get():
         user_data = affected_user_entry.get().strip().split('\t')
         return user_data[:5] if len(user_data) == 5 else ('', '', '', '', '')
@@ -31,7 +35,7 @@ def get_affected_user_data():
         )
 
 def insert_and_format():
-    # ... (unchanged)
+
     selected_var = selected_variable.get()
     failure_type = failure_type_variable.get()
 
@@ -55,6 +59,9 @@ def insert_and_format():
     # Get summary data
     summary_data = summary_entry.get().strip()
 
+    # Create a RichText console
+    console = Console()
+
     # Combine all messages
     result_message = (f"Issue:\n{variable_message}\n\n"
                       f"Customer ID: {customer_id}\nNode/Pod: {node_pod}\nDomain: {domain}\n\n"
@@ -66,12 +73,19 @@ def insert_and_format():
                       f"Similar Ticket: \n\n"
                       f"Conclusion: \n"
                       f"Action: \n")
-
-    # Clear the text area
+    
+    # Clear the Text widget
     format_text.delete(1.0, tk.END)
 
     # Insert the combined result into the format box
-    format_text.insert(tk.END, result_message)
+    format_text.insert(tk.END, result_message + "\n")
+
+def undo_text():
+    try:
+        format_text.edit_undo()
+    except tk.TclError:
+        pass  # Ignore if no more undo operations are available
+ 
 
 def clear_entries():
     # Clear the content of entry widgets
@@ -88,6 +102,11 @@ def clear_entries():
     sizeInGb_entry.delete(0, tk.END)
     selected_var.delete(0, tk.END)
     failure_type_dropdown.delete(0, tk.END)
+
+    # Clear the content of entry widgets
+    #for entry in entry_widgets:
+        #entry.delete(0, tk.END)
+
     
 
     # Clear the content of the text area
@@ -136,7 +155,17 @@ def toggle_dark_mode_command():
 def copy_to_clipboard():
     result_text = format_text.get(1.0, tk.END)
     pyperclip.copy(result_text)
-    messagebox.showinfo("Copy to Clipboard", "Output copied to clipboard!")
+    
+    # Create a Toplevel window for the message
+    message_window = tk.Toplevel(root)
+    message_window.title("Copy to Clipboard")
+
+    # Display the message
+    message_label = tk.Label(message_window, text="Output copied to clipboard!")
+    message_label.pack(padx=10, pady=10)
+
+    # Schedule the message window to close after 2000 milliseconds (2 seconds)
+    message_window.after(2000, message_window.destroy)
 
 
 def update_working_memory(event):
@@ -147,28 +176,46 @@ def update_working_memory(event):
 def show_about():
     about_text = "CTM App\nVersion 1.1\n\n© October 21 2015 CPazmino, LDuBuisson"
     tk.messagebox.showinfo("About", about_text)
+   
+   
 
 root = tk.Tk()
 root.title("CTM")
 
-# Create entry widgets and text area
-selected_var = tk.Entry(root)
-failure_type_dropdown = tk.Entry(root)
-customer_data_entry = tk.Entry(root)
-customer_id_entry = tk.Entry(root)
-node_pod_entry = tk.Entry(root)
-domain_entry = tk.Entry(root)
-summary_entry = tk.Entry(root)
-affected_user_entry = tk.Entry(root)
-name_entry = tk.Entry(root)
-email_entry = tk.Entry(root)
-serviceId_entry = tk.Entry(root)
-lastBackupDate_entry = tk.Entry(root)
-sizeInGb_entry = tk.Entry(root)
-format_text = tk.Text(root, height=12, width=40)
 
 # BooleanVar to determine whether to use tab-separated values
 use_tab_values = tk.BooleanVar(value=True)
+
+# Create a Notebook (tabbed interface)
+notebook = ttk.Notebook(root)
+notebook.pack(fill=tk.BOTH, expand=True)
+
+# Function to switch to the selected page
+def switch_page(event):
+    selected_page = variable_dropdown.get()
+    notebook.select(notebook.index(selected_page))
+
+# Create your pages as separate frames
+page1 = ttk.Frame(notebook)
+page2 = ttk.Frame(notebook)
+page3 = ttk.Frame(notebook)
+page4 = ttk.Frame(notebook)
+
+
+# Add pages to the Notebook
+notebook.add(page1, text="Backup Failure")
+notebook.add(page2, text="Restore Failure")
+notebook.add(page3, text="2FA reset")
+notebook.add(page4, text="DBSR error")
+
+
+# List to store entry widgets for easy access
+entry_widgets = []
+
+# Function to switch to the selected page
+def switch_page(event):
+    selected_page = variable_dropdown.get()
+    notebook.select(notebook.index(selected_page))
 
 # Working memory to dynamically store entry widget values
 working_memory = {}
@@ -196,17 +243,39 @@ options_menu.add_separator()
 options_menu.add_checkbutton(label="Use Tab-Separated Values", variable=use_tab_values, command=use_tab_values)
 
 # Bind the event to update working memory dynamically
-customer_data_entry.bind("<KeyRelease>", update_working_memory)
+#customer_data_entry.bind("<KeyRelease>", update_working_memory)
 
+# Entry widgets for Page 1 (Backup Failure)
+# Create entry widgets and text area
+selected_var = tk.Entry(root)
+failure_type_dropdown = tk.Entry(root)
+customer_data_entry = tk.Entry(root)
+customer_id_entry = tk.Entry(root)
+node_pod_entry = tk.Entry(root)
+domain_entry = tk.Entry(root)
+summary_entry = tk.Entry(root)
+affected_user_entry = tk.Entry(root)
+name_entry = tk.Entry(root)
+email_entry = tk.Entry(root)
+serviceId_entry = tk.Entry(root)
+lastBackupDate_entry = tk.Entry(root)
+sizeInGb_entry = tk.Entry(root)
+format_text = tk.Text(root, height=12, width=40)
 
-# Button to Toggle Dark Mode
-#dark_mode_button = tk.Button(root, text="Toggle Dark Mode", command=toggle_dark_mode)
-#dark_mode_button.pack()
+# Add pages to the Notebook
+notebook.add(page1, text="Backup Failure")
+notebook.add(page2, text="Restore Failure")
+notebook.add(page3, text="2FA reset")
+notebook.add(page4, text="DBSR error")
+# Add widgets to each page
+# ... (add your widgets to page1 and page2)
 
+# Bind the event to switch pages when the dropdown selection changes
+#variable_dropdown.bind("<<ComboboxSelected>>", switch_page)
 
-# Checkbox to choose between tab-separated values and direct entry
-#tab_checkbox = ttk.Checkbutton(root, text="Use Tab-Separated Values", variable=use_tab_values)
-#tab_checkbox.pack()
+# Widgets for Page 1
+label_page1 = tk.Label(page1, text="Page 1 Widgets")
+label_page1.pack(pady=10)
 
 # Define your variable list here
 affected_suite = [
@@ -251,7 +320,7 @@ customer_data_entry.pack()
 customer_id_label = tk.Label(root, text="Customer ID:")
 customer_id_label.pack()
 
-customer_id_entry = tk.Entry(root)
+customer_id_entry = tk.Entry(root, width= 6)
 customer_id_entry.pack()
 
 node_pod_label = tk.Label(root, text="Node/Pod:")
@@ -311,6 +380,27 @@ sizeInGb_label.pack()
 sizeInGb_entry = tk.Entry(root)
 sizeInGb_entry.pack()
 
+# ... (Other widgets for Page 1)
+# Entry widgets for Page 2 (Restore Failure)
+# ... (Define entry widgets for Page 2)
+
+# Entry widgets for Page 3 (2FA reset)
+# ... (Define entry widgets for Page 3)
+
+# Entry widgets for Page 4 (DBSR error)
+# ... (Define entry widgets for Page 4)
+
+# Button to Toggle Dark Mode
+#dark_mode_button = tk.Button(root, text="Toggle Dark Mode", command=toggle_dark_mode)
+#dark_mode_button.pack()
+
+
+# Checkbox to choose between tab-separated values and direct entry
+#tab_checkbox = ttk.Checkbutton(root, text="Use Tab-Separated Values", variable=use_tab_values)
+#tab_checkbox.pack()
+
+
+
 # Button to Insert Variable and Format Data
 insert_and_format_button = tk.Button(root, text="Submit", command=insert_and_format)
 insert_and_format_button.pack()
@@ -326,8 +416,14 @@ copy_button.pack()
 clear_button = tk.Button(root, text="Clear", command=clear_entries)
 clear_button.pack()
 
-# Format Text Area
-format_text = tk.Text(root, height=12, width=40)
+# Create a button for undo
+undo_button = tk.Button(root, text="Undo", command=undo_text)
+undo_button.pack()
+
+# Use a Text widget for displaying rich text
+format_text = tk.Text(root, height=12, width=40, wrap=tk.WORD)
 format_text.pack()
+
+console = Console(width=80)
 
 root.mainloop()
