@@ -104,8 +104,8 @@ def clear_entries():
     failure_type_dropdown.delete(0, tk.END)
 
     # Clear the content of entry widgets
-    #for entry in entry_widgets:
-        #entry.delete(0, tk.END)
+    for entry in entry_widgets:
+        entry.delete(0, tk.END)
 
     
 
@@ -177,23 +177,25 @@ def show_about():
     about_text = "CTM App\nVersion 1.1\n\n© October 21 2015 CPazmino, LDuBuisson"
     tk.messagebox.showinfo("About", about_text)
    
+# Function to switch to the selected page
+def switch_to_page(page_number):
+    notebook.select(page_number)
    
+
 
 root = tk.Tk()
 root.title("CTM")
 
 
 # BooleanVar to determine whether to use tab-separated values
-use_tab_values = tk.BooleanVar(value=True)
+use_tab_values = tk.BooleanVar(value=False)
+
+
 
 # Create a Notebook (tabbed interface)
 notebook = ttk.Notebook(root)
 notebook.pack(fill=tk.BOTH, expand=True)
 
-# Function to switch to the selected page
-def switch_page(event):
-    selected_page = variable_dropdown.get()
-    notebook.select(notebook.index(selected_page))
 
 # Create your pages as separate frames
 page1 = ttk.Frame(notebook)
@@ -212,10 +214,6 @@ notebook.add(page4, text="DBSR error")
 # List to store entry widgets for easy access
 entry_widgets = []
 
-# Function to switch to the selected page
-def switch_page(event):
-    selected_page = variable_dropdown.get()
-    notebook.select(notebook.index(selected_page))
 
 # Working memory to dynamically store entry widget values
 working_memory = {}
@@ -247,6 +245,19 @@ options_menu.add_checkbutton(label="Use Tab-Separated Values", variable=use_tab_
 
 # Entry widgets for Page 1 (Backup Failure)
 # Create entry widgets and text area
+
+
+# Add pages to the Notebook
+notebook.add(page1, text="Backup Failure")
+notebook.add(page2, text="Restore Failure")
+notebook.add(page3, text="2FA reset")
+notebook.add(page4, text="DBSR error")
+# Add widgets to each page
+
+# Entry widgets for Page 1 (Backup Failure)
+# Create entry widgets and text area
+
+# Widgets for Page 1
 selected_var = tk.Entry(root)
 failure_type_dropdown = tk.Entry(root)
 customer_data_entry = tk.Entry(root)
@@ -262,20 +273,6 @@ lastBackupDate_entry = tk.Entry(root)
 sizeInGb_entry = tk.Entry(root)
 format_text = tk.Text(root, height=12, width=40)
 
-# Add pages to the Notebook
-notebook.add(page1, text="Backup Failure")
-notebook.add(page2, text="Restore Failure")
-notebook.add(page3, text="2FA reset")
-notebook.add(page4, text="DBSR error")
-# Add widgets to each page
-# ... (add your widgets to page1 and page2)
-
-# Bind the event to switch pages when the dropdown selection changes
-#variable_dropdown.bind("<<ComboboxSelected>>", switch_page)
-
-# Widgets for Page 1
-label_page1 = tk.Label(page1, text="Page 1 Widgets")
-label_page1.pack(pady=10)
 
 # Define your variable list here
 affected_suite = [
@@ -295,109 +292,179 @@ affected_suite = [
 selected_variable = tk.StringVar()
 failure_type_variable = tk.StringVar()
 
-variable_label = tk.Label(root, text="Select a variable:")
+variable_label = tk.Label(page1, text="Select a variable:")
 variable_label.pack()
 
 # Use your defined variable as the values for the dropdown
-variable_dropdown = ttk.Combobox(root, textvariable=selected_variable, values=affected_suite)
+variable_dropdown = ttk.Combobox(page1, textvariable=selected_variable, values=affected_suite)
 variable_dropdown.pack()
 
-failure_type_label = tk.Label(root, text="Select failure type:")
+failure_type_label = tk.Label(page1, text="Select failure type:")
 failure_type_label.pack()
 
 # Dropdown for selecting failure type
-failure_type_dropdown = ttk.Combobox(root, textvariable=failure_type_variable, values=["Full", "Partial"])
+failure_type_dropdown = ttk.Combobox(page1, textvariable=failure_type_variable, values=["Full", "Partial"])
 failure_type_dropdown.pack()
 
 # Entry for Customer Data
-customer_data_label = tk.Label(root, text="Copy/Paste SQL Data (Customer ID, Node/Pod, Domain separated by tabs):")
+customer_data_label = tk.Label(page1, text="Copy/Paste SQL Data (Customer ID, Node/Pod, Domain separated by tabs):")
 customer_data_label.pack()
 
-customer_data_entry = tk.Entry(root)
+customer_data_entry = tk.Entry(page1)
 customer_data_entry.pack()
 
 # Labels and Entry Widgets for Data Input
-customer_id_label = tk.Label(root, text="Customer ID:")
+customer_id_label = tk.Label(page1, text="Customer ID:")
 customer_id_label.pack()
 
-customer_id_entry = tk.Entry(root, width= 6)
+customer_id_entry = tk.Entry(page1, width= 6)
 customer_id_entry.pack()
 
-node_pod_label = tk.Label(root, text="Node/Pod:")
+node_pod_label = tk.Label(page1, text="Node/Pod:")
 node_pod_label.pack()
 
-node_pod_entry = tk.Entry(root)
+node_pod_entry = tk.Entry(page1)
 node_pod_entry.pack()
 
-domain_label = tk.Label(root, text="Domain:")
+domain_label = tk.Label(page1, text="Domain:")
 domain_label.pack()
 
-domain_entry = tk.Entry(root)
+domain_entry = tk.Entry(page1)
 domain_entry.pack()
 
 # Entry for Summary
-summary_label = tk.Label(root, text="Summary:")
+summary_label = tk.Label(page1, text="Summary:")
 summary_label.pack()
 
-summary_entry = tk.Entry(root)
+summary_entry = tk.Entry(page1)
 summary_entry.pack()
 
 # Entry for affected_user
-affected_user_label = tk.Label(root, text="Copy/Paste SQL Data (name, email, serviceId, lastBackupDate, sizeInGb):")
+affected_user_label = tk.Label(page1, text="Copy/Paste SQL Data (name, email, serviceId, lastBackupDate, sizeInGb):")
 affected_user_label.pack()
 
-affected_user_entry = tk.Entry(root)
+affected_user_entry = tk.Entry(page1)
 affected_user_entry.pack()
 
 # Labels and Entry Widgets for Additional Data Input
-name_label = tk.Label(root, text="Name:")
+name_label = tk.Label(page1, text="Name:")
 name_label.pack()
 
-name_entry = tk.Entry(root)
+name_entry = tk.Entry(page1)
 name_entry.pack()
 
-email_label = tk.Label(root, text="Email:")
+email_label = tk.Label(page1, text="Email:")
 email_label.pack()
 
-email_entry = tk.Entry(root)
+email_entry = tk.Entry(page1)
 email_entry.pack()
 
-serviceId_label = tk.Label(root, text="Service ID:")
+serviceId_label = tk.Label(page1, text="Service ID:")
 serviceId_label.pack()
 
-serviceId_entry = tk.Entry(root)
+serviceId_entry = tk.Entry(page1)
 serviceId_entry.pack()
 
-lastBackupDate_label = tk.Label(root, text="Last Backup Date:")
+lastBackupDate_label = tk.Label(page1, text="Last Backup Date:")
 lastBackupDate_label.pack()
 
-lastBackupDate_entry = tk.Entry(root)
+lastBackupDate_entry = tk.Entry(page1)
 lastBackupDate_entry.pack()
 
-sizeInGb_label = tk.Label(root, text="Size in GB:")
+sizeInGb_label = tk.Label(page1, text="Size in GB:")
 sizeInGb_label.pack()
 
-sizeInGb_entry = tk.Entry(root)
+sizeInGb_entry = tk.Entry(page1)
 sizeInGb_entry.pack()
 
-# ... (Other widgets for Page 1)
+
+
+
 # Entry widgets for Page 2 (Restore Failure)
-# ... (Define entry widgets for Page 2)
+selected_variable_restore = tk.StringVar()
+failure_type_variable_restore = tk.StringVar()
+variable_dropdown_restore = ttk.Combobox(page2, textvariable=selected_variable_restore, values= "Office365Teams, Office365Exchange, Office365SharePoint, Office365OneDrive, GoogleMail, GoogleCalendar,GoogleContacts,GoogleDrive,GoogleTeamDrives, GWS, MS 365")
+variable_dropdown_restore.pack()
+
+failure_type_dropdown_restore = ttk.Combobox(page2, textvariable=failure_type_variable_restore, values=["Restore", "Export"])
+failure_type_dropdown_restore.pack()
+
+# Entry for Customer Data
+customer_data_label_restore = tk.Label(page2, text="Copy/Paste SQL Data (Customer ID, Node/Pod, Domain separated by tabs):")
+customer_data_label_restore.pack()
+
+customer_data_entry_restore = tk.Entry(page2)
+customer_data_entry_restore.pack()
+
+# Labels and Entry Widgets for Data Input
+customer_id_label_restore = tk.Label(page2, text="Customer ID:")
+customer_id_label_restore.pack()
+
+customer_id_entry_restore = tk.Entry(page2, width=6)
+customer_id_entry_restore.pack()
+
+node_pod_label_restore = tk.Label(page2, text="Node/Pod:")
+node_pod_label_restore.pack()
+
+node_pod_entry_restore = tk.Entry(page2)
+node_pod_entry_restore.pack()
+
+domain_label_restore = tk.Label(page2, text="Domain:")
+domain_label_restore.pack()
+
+domain_entry_restore = tk.Entry(page2)
+domain_entry_restore.pack()
+
+# Entry for Summary
+summary_label_restore = tk.Label(page2, text="Summary:")
+summary_label_restore.pack()
+
+summary_entry_restore = tk.Entry(page2)
+summary_entry_restore.pack()
+
+# Entry for affected_user
+affected_user_label_restore = tk.Label(page2, text="Copy/Paste SQL Data (name, email, serviceId, lastBackupDate, sizeInGb):")
+affected_user_label_restore.pack()
+
+affected_user_entry_restore = tk.Entry(page2)
+affected_user_entry_restore.pack()
+
+# Labels and Entry Widgets for Additional Data Input
+name_label_restore = tk.Label(page2, text="Name:")
+name_label_restore.pack()
+
+name_entry_restore = tk.Entry(page2)
+name_entry_restore.pack()
+
+email_label_restore = tk.Label(page2, text="Email:")
+email_label_restore.pack()
+
+email_entry_restore = tk.Entry(page2)
+email_entry_restore.pack()
+
+serviceId_label_restore = tk.Label(page2, text="Service ID:")
+serviceId_label_restore.pack()
+
+serviceId_entry_restore = tk.Entry(page2)
+serviceId_entry_restore.pack()
+
+lastBackupDate_label_restore = tk.Label(page2, text="Last Backup Date:")
+lastBackupDate_label_restore.pack()
+
+lastBackupDate_entry_restore = tk.Entry(page2)
+lastBackupDate_entry_restore.pack()
+
+sizeInGb_label_restore = tk.Label(page2, text="Size in GB:")
+sizeInGb_label_restore.pack()
+
+sizeInGb_entry_restore = tk.Entry(page2)
+sizeInGb_entry_restore.pack()
 
 # Entry widgets for Page 3 (2FA reset)
 # ... (Define entry widgets for Page 3)
 
 # Entry widgets for Page 4 (DBSR error)
 # ... (Define entry widgets for Page 4)
-
-# Button to Toggle Dark Mode
-#dark_mode_button = tk.Button(root, text="Toggle Dark Mode", command=toggle_dark_mode)
-#dark_mode_button.pack()
-
-
-# Checkbox to choose between tab-separated values and direct entry
-#tab_checkbox = ttk.Checkbutton(root, text="Use Tab-Separated Values", variable=use_tab_values)
-#tab_checkbox.pack()
 
 
 
